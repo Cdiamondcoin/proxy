@@ -19,18 +19,20 @@ export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
 export ETH_GAS=${ETH_GAS:-"4000000"}
 # 1000000000 wei = 1 gwei
 export ETH_GAS_PRICE=${ETH_GAS_PRICE:-"10000000000"}
-export NETWORK=$(seth chain)
 
 # export ETH_FROM=$(seth rpc eth_coinbase)
 export ETH_FROM=0x9556E25F9b4D343ee38348b6Db8691d10fD08A61
 
-test -z $NETWORK && exit 1
-
 dapp build
 
-hevm flatten --source-file src/Proxy.sol --json-file out/Proxy.sol.json > out/Proxy-flatt.sol
+hevm flatten --source-file src/CdcProxy.sol --json-file out/CdcProxy.sol.json > out/CdcProxy-flatt.sol
+# hevm flatten --source-file lib/ds-proxy/src/proxy.sol --json-file out/Proxy.sol.json > out/Proxy-flatt.sol
 
-ProxyContract=$(dapp create DSProxyFactory)
-export ProxyContract=$ProxyContract
+DSProxyFactory=$(dapp create DSProxyFactory)
+export DSProxyFactory=$DSProxyFactory
+echo -e "DSProxyFactory DEPLOYED AT: $DSProxyFactory"
 
-echo -e "ProxyContract DEPLOYED AT: $ProxyContract"
+CdcProxy=$(dapp create CdcProxy "$DSProxyFactory")
+export CdcProxy=$CdcProxy
+
+echo -e "CdcProxy DEPLOYED AT: $CdcProxy"
